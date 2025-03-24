@@ -7,8 +7,8 @@ An Invoice Generator project built with React and TailwindCSS. Add items, quanti
 
 ### Screenshots
 
-<img src="/ss1.png" style="max-width: 100px; width: 100%; height: auto;">
-<img src="/ss2.png" style="max-width: 100px;width: 100%; height: auto;">
+<img src="./public/ss1.png" style="max-width: 100px; width: 100%; height: auto;">
+<img src="./public/ss2.png" style="max-width: 100px;width: 100%; height: auto;">
 <img src="./public/ss3.png" style="max-width: 100px;width: 100%; height: auto;">
 
 ### Tools
