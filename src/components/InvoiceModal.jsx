@@ -24,60 +24,53 @@ const InvoiceModal = ({
     toPng(dom)
       .then((dataUrl) => {
         const img = new Image();
-        img.crossOrigin = 'annoymous';
+        img.crossOrigin = 'anonymous';
         img.src = dataUrl;
         img.onload = () => {
-          // Initialize the PDF.
           const pdf = new jsPDF({
             orientation: 'portrait',
             unit: 'in',
             format: [5.5, 8.5],
           });
 
-          // Define reused data
           const imgProps = pdf.getImageProperties(img);
           const imageType = imgProps.fileType;
           const pdfWidth = pdf.internal.pageSize.getWidth();
 
-          // Calculate the number of pages.
           const pxFullHeight = imgProps.height;
           const pxPageHeight = Math.floor((imgProps.width * 8.5) / 5.5);
           const nPages = Math.ceil(pxFullHeight / pxPageHeight);
 
-          // Define pageHeight separately so it can be trimmed on the final page.
           let pageHeight = pdf.internal.pageSize.getHeight();
 
-          // Create a one-page canvas to split up the full image.
           const pageCanvas = document.createElement('canvas');
           const pageCtx = pageCanvas.getContext('2d');
           pageCanvas.width = imgProps.width;
           pageCanvas.height = pxPageHeight;
 
           for (let page = 0; page < nPages; page++) {
-            // Trim the final page to reduce file size.
             if (page === nPages - 1 && pxFullHeight % pxPageHeight !== 0) {
               pageCanvas.height = pxFullHeight % pxPageHeight;
               pageHeight = (pageCanvas.height * pdfWidth) / pageCanvas.width;
             }
-            // Display the page.
+
             const w = pageCanvas.width;
             const h = pageCanvas.height;
             pageCtx.fillStyle = 'white';
             pageCtx.fillRect(0, 0, w, h);
             pageCtx.drawImage(img, 0, page * pxPageHeight, w, h, 0, 0, w, h);
 
-            // Add the page to the PDF.
             if (page) pdf.addPage();
 
             const imgData = pageCanvas.toDataURL(`image/${imageType}`, 1);
             pdf.addImage(imgData, imageType, 0, 0, pdfWidth, pageHeight);
           }
-          // Output / Save
+
           pdf.save(`invoice-${invoiceInfo.invoiceNumber}.pdf`);
         };
       })
       .catch((error) => {
-        console.error('oops, something went wrong!', error);
+        console.error('Oops, something went wrong!', error);
       });
   };
 
@@ -101,7 +94,6 @@ const InvoiceModal = ({
             <Dialog.Overlay className="fixed inset-0 bg-black/50" />
           </Transition.Child>
 
-          {/* This element is to trick the browser into centering the modal contents. */}
           <span
             className="inline-block h-screen align-middle"
             aria-hidden="true"
@@ -117,24 +109,34 @@ const InvoiceModal = ({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <div className="my-8 inline-block w-full max-w-md transform overflow-hidden rounded-lg bg-white text-left align-middle shadow-xl transition-all">
-              <div className="p-4" id="print">
-                <h1 className="text-center text-lg font-bold text-gray-900">
+            <div className="my-8 inline-block w-full max-w-lg transform overflow-hidden rounded-lg bg-white shadow-2xl transition-all">
+              <div className="p-6" id="print">
+                <h1 className="text-center text-2xl font-bold text-gray-800">
                   INVOICE
                 </h1>
                 <div className="mt-6">
-                  <div className="mb-4 grid grid-cols-2">
-                    <span className="font-bold">Invoice Number:</span>
-                    <span>{invoiceInfo.invoiceNumber}</span>
-                    <span className="font-bold">Cashier:</span>
-                    <span>{invoiceInfo.cashierName}</span>
-                    <span className="font-bold">Customer:</span>
-                    <span>{invoiceInfo.customerName}</span>
+                  <div className="mb-6 grid grid-cols-2 gap-4">
+                    <span className="font-semibold text-gray-600">
+                      Invoice Number:
+                    </span>
+                    <span className="text-gray-800">
+                      {invoiceInfo.invoiceNumber}
+                    </span>
+                    <span className="font-semibold text-gray-600">Cashier:</span>
+                    <span className="text-gray-800">
+                      {invoiceInfo.cashierName}
+                    </span>
+                    <span className="font-semibold text-gray-600">
+                      Customer:
+                    </span>
+                    <span className="text-gray-800">
+                      {invoiceInfo.customerName}
+                    </span>
                   </div>
 
-                  <table className="w-full text-left">
+                  <table className="w-full text-left text-sm">
                     <thead>
-                      <tr className="border-y border-black/10 text-sm md:text-base">
+                      <tr className="border-y border-gray-300 text-gray-600">
                         <th>ITEM</th>
                         <th className="text-center">QTY</th>
                         <th className="text-right">PRICE</th>
@@ -143,15 +145,13 @@ const InvoiceModal = ({
                     </thead>
                     <tbody>
                       {items.map((item) => (
-                        <tr key={item.id}>
-                          <td className="w-full">{item.name}</td>
-                          <td className="min-w-[50px] text-center">
-                            {item.qty}
-                          </td>
-                          <td className="min-w-[80px] text-right">
+                        <tr key={item.id} className="border-b">
+                          <td className="py-2">{item.name}</td>
+                          <td className="py-2 text-center">{item.qty}</td>
+                          <td className="py-2 text-right">
                             ${Number(item.price).toFixed(2)}
                           </td>
-                          <td className="min-w-[90px] text-right">
+                          <td className="py-2 text-right">
                             ${Number(item.price * item.qty).toFixed(2)}
                           </td>
                         </tr>
@@ -159,22 +159,32 @@ const InvoiceModal = ({
                     </tbody>
                   </table>
 
-                  <div className="mt-4 flex flex-col items-end space-y-2">
-                    <div className="flex w-full justify-between border-t border-black/10 pt-2">
-                      <span className="font-bold">Subtotal:</span>
-                      <span>${invoiceInfo.subtotal.toFixed(2)}</span>
+                  <div className="mt-6 flex flex-col items-end space-y-2">
+                    <div className="flex w-full justify-between border-t border-gray-300 pt-2">
+                      <span className="font-semibold text-gray-600">
+                        Subtotal:
+                      </span>
+                      <span className="text-gray-800">
+                        ${invoiceInfo.subtotal.toFixed(2)}
+                      </span>
                     </div>
                     <div className="flex w-full justify-between">
-                      <span className="font-bold">Discount:</span>
-                      <span>${invoiceInfo.discountRate.toFixed(2)}</span>
+                      <span className="font-semibold text-gray-600">
+                        Discount:
+                      </span>
+                      <span className="text-gray-800">
+                        ${invoiceInfo.discountRate.toFixed(2)}
+                      </span>
                     </div>
                     <div className="flex w-full justify-between">
-                      <span className="font-bold">Tax:</span>
-                      <span>${invoiceInfo.taxRate.toFixed(2)}</span>
+                      <span className="font-semibold text-gray-600">Tax:</span>
+                      <span className="text-gray-800">
+                        ${invoiceInfo.taxRate.toFixed(2)}
+                      </span>
                     </div>
-                    <div className="flex w-full justify-between border-t border-black/10 py-2">
-                      <span className="font-bold">Total:</span>
-                      <span className="font-bold">
+                    <div className="flex w-full justify-between border-t border-gray-300 py-2">
+                      <span className="font-bold text-gray-800">Total:</span>
+                      <span className="font-bold text-gray-900">
                         $
                         {invoiceInfo.total % 1 === 0
                           ? invoiceInfo.total
@@ -184,14 +194,14 @@ const InvoiceModal = ({
                   </div>
                 </div>
               </div>
-              <div className="mt-4 flex space-x-2 px-4 pb-6">
+              <div className="mt-6 flex space-x-4 px-6 pb-6">
                 <button
-                  className="flex w-full items-center justify-center space-x-1 rounded-md border border-blue-500 py-2 text-sm text-blue-500 shadow-sm hover:bg-blue-500 hover:text-white"
+                  className="flex w-full items-center justify-center space-x-2 rounded-md border border-blue-500 py-2 text-sm font-medium text-blue-500 shadow-sm hover:bg-blue-500 hover:text-white"
                   onClick={SaveAsPDFHandler}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
+                    className="h-5 w-5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -207,11 +217,11 @@ const InvoiceModal = ({
                 </button>
                 <button
                   onClick={addNextInvoiceHandler}
-                  className="flex w-full items-center justify-center space-x-1 rounded-md bg-blue-500 py-2 text-sm text-white shadow-sm hover:bg-blue-600"
+                  className="flex w-full items-center justify-center space-x-2 rounded-md bg-blue-500 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-600"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
+                    className="h-5 w-5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
