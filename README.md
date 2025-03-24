@@ -25,11 +25,11 @@ https://invoice-generator-355.netlify.app/
 ### Instalation
 
 ```
-git clone https://github.com/hourmeng12/invoice-generator
+git clone https://github.com/Kedar355/react-invoice-generator.git
 
 npm install
 
 npm start / npm run build
 ```
 
-### Made By Kedar Shah
+### Made By Kedar Shah - https://kedar355.vercel.app/
